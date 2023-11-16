@@ -1,0 +1,78 @@
+import pygame
+import random
+import time
+
+# Initialize Pygame
+pygame.init()
+
+# Constants
+WIDTH, HEIGHT = 800, 600
+FPS = 60
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+
+# Initialize display
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Rhythm Tapping Game")
+clock = pygame.time.Clock()
+
+# Initialize variables
+tap_sequence = []
+score = 0
+
+# Function to generate a random rhythm sequence
+def generate_rhythm_sequence(length):
+    return [random.choice([0, 1]) for _ in range(length)]
+
+# Function to play the rhythm sequence
+def play_rhythm_sequence(sequence):
+    for beat in sequence:
+        if beat == 1:
+            print("Tap on the beat!")
+        time.sleep(1)  # Adjust this delay based on the desired tempo
+        print("")
+
+# Function to display the score
+def display_score(score):
+    font = pygame.font.Font(None, 36)
+    score_text = font.render(f"Score: {score}", True, BLACK)
+    screen.blit(score_text, (10, 10))
+
+# Main game loop
+running = True
+while running:
+    clock.tick(FPS)
+
+    # Event handling
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                tap_sequence.append(1)
+            else:
+                tap_sequence.append(0)
+
+    # Generate and play rhythm sequence
+    rhythm_sequence = generate_rhythm_sequence(4)  # Change the length as needed
+    play_rhythm_sequence(rhythm_sequence)
+
+    # Compare the tapped sequence with the generated sequence
+    if tap_sequence == rhythm_sequence:
+        score += 1
+    else:
+        score = 0
+        print("Wrong sequence. Try again.")
+
+    # Clear the tapped sequence for the next round
+    tap_sequence = []
+
+    # Display score
+    screen.fill(WHITE)
+    display_score(score)
+
+    # Update the display
+    pygame.display.flip()
+
+# Quit Pygame
+pygame.quit()
