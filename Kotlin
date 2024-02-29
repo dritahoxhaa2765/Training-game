@@ -1,0 +1,109 @@
+import android.os.Bundle
+import android.os.Handler
+import android.view.MotionEvent
+import android.view.View
+import android.widget.Button
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import java.util.*
+
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var rhythmTextView: TextView
+    private lateinit var scoreTextView: TextView
+    private lateinit var tapButton: Button
+
+    private var rhythmSequence = mutableListOf<Int>()
+    private var tapSequence = mutableListOf<Int>()
+    private var score = 0
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        rhythmTextView = findViewById(R.id.rhythmTextView)
+        scoreTextView = findViewById(R.id.scoreTextView)
+        tapButton = findViewById(R.id.tapButton)
+
+        tapButton.setOnTouchListener(object : View.OnTouchListener {
+            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+                when (event?.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        tapSequence.add(1)
+                        checkSequence()
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        tapSequence.add(0)
+                    }
+                }
+                return true
+            }
+        })
+    }
+
+    private fun generateRhythmSequence(length: Int) {
+        rhythmSequence.clear()
+        val random = Random()
+        for (i in 0 until length) {
+            rhythmSequence.add(random.nextInt(2))
+        }
+        displayRhythmSequence()
+    }
+
+    private fun displayRhythmSequence() {
+        rhythmTextView.text = rhythmSequence.joinToString(" ")
+    }
+
+    private fun checkSequence() {
+        if (tapSequence == rhythmSequence) {
+            score++
+        } else {
+            score = 0
+            tapSequence.clear()
+            Handler().postDelayed({
+                generateRhythmSequence(4)  // Change the length as needed
+            }, 1000)  // Adjust this delay based on the desired tempo
+        }
+
+        displayScore()
+    }
+
+    private fun displayScore() {
+        scoreTextView.text = "Score: $score"
+    }
+}
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/rhythmTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Rhythm Sequence"
+        android:textSize="20sp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"/>
+
+    <TextView
+        android:id="@+id/scoreTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Score: 0"
+        android:textSize="20sp"
+        android:layout_below="@id/rhythmTextView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"/>
+
+    <Button
+        android:id="@+id/tapButton"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/scoreTextView"
+        android:layout_marginTop="50dp"
+        android:text="Tap to Match Rhythm"/>
+
+</RelativeLayout>
